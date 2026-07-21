@@ -3,5 +3,4 @@ target/
 .git/
 .claude/
 *.md
-docker-compose.yml
 .env
