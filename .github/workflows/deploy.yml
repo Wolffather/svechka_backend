@@ -36,5 +36,5 @@ jobs:
               --name svechka-backend \
               --restart unless-stopped \
               -p 8080:8080 \
-              --env-file /containerd/.env \
+              --env-file /opt/containerd/.env \
               svechka-backend:latest
