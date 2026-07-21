@@ -29,12 +29,4 @@ jobs:
           timeout: 30m
           script: |
             cd /opt/app
-            docker build --no-cache -t svechka-backend:latest .
-            docker stop svechka-backend || true
-            docker rm svechka-backend || true
-            docker run -d \
-              --name svechka-backend \
-              --restart unless-stopped \
-              -p 8080:8080 \
-              --env-file /opt/containerd/.env \
-              svechka-backend:latest
+            docker compose up -d --build

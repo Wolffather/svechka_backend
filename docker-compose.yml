@@ -9,6 +9,23 @@ services:
       - "5432:5432"
     volumes:
       - svechka-backend-postgres-data:/var/lib/postgresql/data
+    networks:
+      - svechka-network
+
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - /opt/containerd/.env
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - svechka-network
 
 volumes:
   svechka-backend-postgres-data:
+
+networks:
+  svechka-network:
