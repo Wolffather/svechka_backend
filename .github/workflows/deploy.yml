@@ -26,9 +26,10 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          timeout: 30m
           script: |
             cd /opt/app
-            docker build -t svechka-backend:latest .
+            docker build --no-cache -t svechka-backend:latest .
             docker stop svechka-backend || true
             docker rm svechka-backend || true
             docker run -d \
