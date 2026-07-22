@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Base64;
@@ -87,18 +88,25 @@ public class YandexSpeechKitTranscriptionClient extends AbstractRetryingAiClient
     }
 
     private String recognizeSync(byte[] pcm, int sampleRateHertz) {
-        SyncRecognitionResponse response = callWithRetry("stt-sync", () -> yandexSttRestClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/speech/v1/stt:recognize")
-                        .queryParam("folderId", yandexProperties.getFolderId())
-                        .queryParam("lang", "ru-RU")
-                        .queryParam("format", "lpcm")
-                        .queryParam("sampleRateHertz", sampleRateHertz)
-                        .build())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(pcm)
-                .retrieve()
-                .body(SyncRecognitionResponse.class));
+        SyncRecognitionResponse response = callWithRetry("stt-sync", () -> {
+            var spec = yandexSttRestClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/speech/v1/stt:recognize")
+                            .queryParam("folderId", yandexProperties.getFolderId())
+                            .queryParam("lang", "ru-RU")
+                            .queryParam("format", "lpcm")
+                            .queryParam("sampleRateHertz", sampleRateHertz)
+                            .build())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(pcm);
+            return spec.exchange((request, responseBody) -> {
+                if (responseBody.getStatusCode().isError()) {
+                    String errorBody = new String(responseBody.getBody().readAllBytes(), StandardCharsets.UTF_8);
+                    log.warn("STT sync request failed with status {}: {}", responseBody.getStatusCode(), errorBody);
+                }
+                return responseBody.bodyTo(SyncRecognitionResponse.class);
+            });
+        });
 
         return response != null && response.result() != null ? response.result() : "";
     }
@@ -114,11 +122,18 @@ public class YandexSpeechKitTranscriptionClient extends AbstractRetryingAiClient
                         yandexProperties.getFolderId()),
                 new RecognitionAudio(base64Audio));
 
-        OperationEnvelope submitted = callWithRetry("stt-async-submit", () -> yandexTranscribeRestClient.post()
-                .uri("/speech/stt/v2/longRunningRecognize")
-                .body(request)
-                .retrieve()
-                .body(OperationEnvelope.class));
+        OperationEnvelope submitted = callWithRetry("stt-async-submit", () -> {
+            var spec = yandexTranscribeRestClient.post()
+                    .uri("/speech/stt/v2/longRunningRecognize")
+                    .body(request);
+            return spec.exchange((req, responseBody) -> {
+                if (responseBody.getStatusCode().isError()) {
+                    String errorBody = new String(responseBody.getBody().readAllBytes(), StandardCharsets.UTF_8);
+                    log.warn("STT async submit request failed with status {}: {}", responseBody.getStatusCode(), errorBody);
+                }
+                return responseBody.bodyTo(OperationEnvelope.class);
+            });
+        });
 
         if (submitted == null || submitted.id() == null) {
             throw new AiServiceException(new IllegalStateException("Yandex STT did not return an operation id"));
