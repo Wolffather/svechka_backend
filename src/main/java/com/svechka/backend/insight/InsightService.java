@@ -5,6 +5,7 @@ import com.svechka.backend.common.PageResponse;
 import com.svechka.backend.diary.DiaryEntry;
 import com.svechka.backend.diary.DiaryEntryRepository;
 import com.svechka.backend.diary.DiaryEntryStatus;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class InsightService {
 
     private static final Logger log = LoggerFactory.getLogger(InsightService.class);
@@ -24,13 +26,6 @@ public class InsightService {
     private final WeeklyInsightRepository weeklyInsightRepository;
     private final DiaryEntryRepository diaryEntryRepository;
     private final DialogEngineClient dialogEngineClient;
-
-    public InsightService(WeeklyInsightRepository weeklyInsightRepository, DiaryEntryRepository diaryEntryRepository,
-                           DialogEngineClient dialogEngineClient) {
-        this.weeklyInsightRepository = weeklyInsightRepository;
-        this.diaryEntryRepository = diaryEntryRepository;
-        this.dialogEngineClient = dialogEngineClient;
-    }
 
     /**
      * Idempotent: safe to run repeatedly for the same week, updates rather than duplicates.

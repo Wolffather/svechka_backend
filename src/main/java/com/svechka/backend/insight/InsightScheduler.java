@@ -1,5 +1,6 @@
 package com.svechka.backend.insight;
 
+import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -8,13 +9,10 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 
 @Component
+@AllArgsConstructor
 public class InsightScheduler {
 
     private final InsightService insightService;
-
-    public InsightScheduler(InsightService insightService) {
-        this.insightService = insightService;
-    }
 
     /**
      * Sunday 22:00 server time: builds the retrospective for the week that just ended

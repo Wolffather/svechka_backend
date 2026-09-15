@@ -1,6 +1,7 @@
 package com.svechka.backend.diary;
 
 import com.svechka.backend.common.PageResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,13 +18,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/entries")
+@AllArgsConstructor
 public class DiaryController {
 
     private final DiaryService diaryService;
-
-    public DiaryController(DiaryService diaryService) {
-        this.diaryService = diaryService;
-    }
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<EntryCreateResponse> createEntry(

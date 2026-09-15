@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +17,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class JwtService {
 
+    @Value("${jwt.secret}")
     private final SecretKey key;
+    @Value("${jwt.expiration-days}")
     private final long expirationDays;
-
-    public JwtService(@Value("${jwt.secret}") String secret,
-                       @Value("${jwt.expiration-days}") long expirationDays) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationDays = expirationDays;
-    }
 
     public String generateToken(UUID userId) {
         Instant now = Instant.now();

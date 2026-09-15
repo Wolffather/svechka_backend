@@ -1,6 +1,7 @@
 package com.svechka.backend.insight;
 
 import com.svechka.backend.common.PageResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +13,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/insights")
+@AllArgsConstructor
 public class InsightController {
 
     private final InsightService insightService;
-
-    public InsightController(InsightService insightService) {
-        this.insightService = insightService;
-    }
 
     @GetMapping
     public ResponseEntity<PageResponse<InsightResponse>> listInsights(

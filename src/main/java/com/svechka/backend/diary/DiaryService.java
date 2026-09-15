@@ -4,6 +4,7 @@ import com.svechka.backend.ai.DialogEngineClient;
 import com.svechka.backend.ai.FollowUpDecision;
 import com.svechka.backend.ai.TranscriptionClient;
 import com.svechka.backend.common.PageResponse;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class DiaryService {
 
     private static final Logger log = LoggerFactory.getLogger(DiaryService.class);
@@ -34,14 +36,6 @@ public class DiaryService {
     private final TranscriptionClient transcriptionClient;
     private final DialogEngineClient dialogEngineClient;
     private final TempAudioFileService tempAudioFileService;
-
-    public DiaryService(DiaryEntryRepository repository, TranscriptionClient transcriptionClient,
-                         DialogEngineClient dialogEngineClient, TempAudioFileService tempAudioFileService) {
-        this.repository = repository;
-        this.transcriptionClient = transcriptionClient;
-        this.dialogEngineClient = dialogEngineClient;
-        this.tempAudioFileService = tempAudioFileService;
-    }
 
     public EntryCreateResponse createEntry(UUID userId, LocalDate date, MultipartFile audio) {
         log.info("createEntry called: user={}, date={}, audioSize={}", userId, date, audio.getSize());
